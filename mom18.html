@@ -3,7 +3,7 @@
 
 <head>
 
-<title> Happy Birthday David! </title>
+<title> Happy Birthday Mom! </title>
 
 </head>
 
@@ -17,15 +17,16 @@ var pHeight = 20;
 var oWidth = 200;
 var oHeight = 10;
 
+var offset = 10;
 var a = 300;
 var b = 50;
 var token;
 var p1;
 var p2;
-var w = 270;
-var w2 = 70;
-var ground = 600;
-var lettersList = ['H', 'A', 'P', 'P', 'Y', 'B', 'I', 'R', 'T', 'H', 'D', 'A', 'Y', 'D', 'A', 'V', 'I', 'D', '!'];
+var w = 70;
+var ground = 525;
+var lettersList = ['H', 'A', 'P', 'P', 'Y', 'B', 'I', 'R', 'T', 'H', 'D', 'A', 'Y', 'M', 'O', 'M', '!'];
+var typeList = ["Fire", "Water", "Electric", "Grass", "Ice", "Fighting", "Poison", "Ground", "Flying", "Psychic", "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"];
 var letters = [];
 var j = [];
 var uncovered = [];
@@ -34,18 +35,16 @@ var obsColor = "red";
 var letterHeight = 100;
 var pxList = [50, 450];
 var pyList = [425, 230];
-var pList;
+//var pList;
 var oxList = [0, 300];
 var oyList = [300, 75];
-var oList;
+//var oList;
 var nextPosition;
-var total_width = 20*w;
-var gameOver = false;
-var movingSpeed = -2;
-var lettersRevealed = 0;
+
 
 function startGame() {
-	token = new component(30, 30, color, 10, ground-30);
+	token = new component(20, 20, color, 10, ground-30);
+	my_attacks = new charge();
 //	p1 = new platform(pxList[0], pyList[0]);
 //	p2 = new platform(pxList[1], pyList[1]);
 //	o1 = new obstacle(oxList[0], oyList[0]);
@@ -57,7 +56,7 @@ function startGame() {
 	}
 	for (l in lettersList) {
 		var r = Math.floor(Math.random() * (j.length));
-		letters.push(new letter(lettersList[l], j[r]));
+		letters.push(new letter(lettersList[l], j[r], typeList[l]));
 		j.splice(r, 1);	
 	}	
 	nextPosition = 0;
@@ -82,6 +81,32 @@ document.addEventListener("keypress", jump);
 window.addEventListener("keydown", sideways);
 window.addEventListener("keyup", stop);
 
+
+function charge() {
+	this.poke_type = null;
+	this.color = null;
+	this.charged = false;
+	this.pending_charge = false;
+
+	this.get_charge = function(poke_type, color) {
+		this.pending_charge = true;
+		this.poke_type = poke_type;
+		this.color = color;
+	}
+	this.use_charge = function() {
+		this.charged = false;
+	}
+
+	this.update = function() {
+		if (this.pending_charge || this.charged) {
+			
+			ctx = myGameArea.context;
+			ctx.font = "30pt Arial";
+			ctx.fillStyle = this.color;
+			ctx.fillText(this.poke_type, 20, ctx.canvas.height - letterHeight);
+		}
+	}
+}
 
 function measureText(text, font, size) {
 	var str = text + ':' + font + ':' + size;
@@ -112,39 +137,89 @@ function measureText(text, font, size) {
 }
 
 
-function letter(lett, position) {
+function letter(lett, position, Poketype) {
 	this.visible = true;
 	this.lett = lett;
 	this.position = position;
-	this.lettHeight = ground;
-	this.x = (this.position)*(w)+200;
-	this.y = this.lettHeight;
-	this.speedX = -2;
+	this.lettHeight = a;
+	this.Poketype = Poketype;
+	this.box = true;
+	switch(Poketype) {
+		case "Fire":
+			this.color = "red";
+			break;
+		case "Water":
+			this.color = "blue";
+			break;
+		case "Electric":
+			this.color = "yellow";
+			break;
+		case "Grass":
+			this.color = "green";
+			break;
+		case "Ice":
+			this.color = "aquamarine";
+			break;
+		case "Fighting":
+			this.color = "brown";
+			break;
+		case "Poison":
+			this.color = "purple";
+			break;
+		case "Ground":
+			this.color = "tan";
+			break;
+		case "Flying":
+			this.color = "MediumPurple";
+			break;
+		case "Psychic":
+			this.color = "DeepPink";
+			break;
+		case "Bug":
+			this.color = "YellowGreen";
+			break;
+		case "Rock":
+			this.color = "Tan";
+			break;
+		case "Ghost":
+			this.color = "SlateBlue";
+			break;
+		case "Dragon":
+			this.color = "Indigo";
+			break;
+		case "Dark":
+			this.color = "black";
+			break;
+		case "Steel":
+			this.color = "grey";
+			break;
+		case "Fairy":
+			this.color = "Orchid";
+			break;
+		default:
+			this.color = "black";
+	}
 	this.update = function() {
 		ctx = myGameArea.context;
-		ctx.font = "30pt Arial";
-		this.height = measureText(this.lett, 'Arial', 30)[1];
-		this.width = measureText(this.lett, 'Arial', 30)[0] +30;
-		if (gameOver == false) {
-			this.speedX = movingSpeed;
-		}
+		ctx.font = "20pt Arial";
+		this.height = measureText(this.lett, 'Arial', 20)[1];
+		this.width = measureText(this.lett, 'Arial', 20)[0] +20;
 		ctx.fillStyle = color; 
 			
 		if (this.visible) {
-			temp = this.x+this.speedX;
-			if (temp>0) {
-				this.x = temp;
+			ctx.font = "20pt Arial";
+			ctx.fillStyle = color; 
+			ctx.fillText(this.lett, (this.position)*(w)+offset, this.lettHeight);
+			ctx.font = "10pt Arial";
+			ctx.fillStyle = this.color;
+			ctx.fillText(this.Poketype, (this.position)*(w), this.lettHeight-50);
+			ctx.beginPath();
+			if (this.box==true) {
+				ctx.lineWidth = "2";
+				ctx.strokeStyle=this.color;
+				ctx.rect(this.position*w, this.lettHeight-25, this.width, this.height);
+				ctx.stroke();	
 			}
-			else {
-				this.x = (total_width +temp); 
-			}
-			ctx.fillText(this.lett, this.x,  this.y);
-		}
-		else {
-			this.speedX = 0;
-		}
-		if (gameOver) {
-			this.speedX = 0;
 		}
 	}
 }
@@ -228,6 +303,10 @@ function component(width, height, color, x, y) {
 	}
 
 	this.newSpeed = function() {
+		if (this.onGround && my_attacks.pending_charge) {
+			my_attacks.charged = true;
+			my_attacks.pending_charge = false;
+		}
 		if (this.jumping) {
 			this.onPlatform = false;
 			this.onGround = false;
@@ -308,44 +387,126 @@ function component(width, height, color, x, y) {
 		var right1 = this.x + (this.width);
 		var top1 = this.y;
 		var bottom1 = this.y + (this.height);
-		var left2 = lett.x;
+		var left2 = lett.position*(w) + offset;
 		var right2 = left2 + (lett.width) - 30;
-		var top2 = lett.y-lett.height;
-		var bottom2 = lett.y;
+		var top2 = lett.lettHeight-lett.height;
+		var bottom2 = lett.lettHeight;
 		if (((bottom1 > top2) && (top1<bottom2) && (left1 < right2) && (right1 > left2))) {
-			if (lett.lett == lettersList[nextPosition] && lett.visible && !gameOver) {
-				lett.visible = false;
-				nextPosition += 1;
-				lettersRevealed += 1;
-
-
-				if (lettersRevealed > 18) {
-					movingSpeed = -14;
-				}
-				else if (lettersRevealed > 17) {
-					movingSpeed = -12.5;
-				}
-				else if (lettersRevealed > 16) {
-					movingSpeed = -11;
-				}
-				else if (lettersRevealed > 15) {
-					movingSpeed = -9.5;
-				}
-				else if (lettersRevealed > 14) {
-					movingSpeed = -8;
-				}
-				else if (lettersRevealed > 12) {
-					movingSpeed = -6.5;
-				}
-				else if (lettersRevealed > 9) {
-					movingSpeed = -5;
-				}
-				else if (lettersRevealed > 4) {
-					movingSpeed = -3.5;
+			if (lett.lett == lettersList[nextPosition] && lett.visible) {
+				if (!lett.box) {
+					lett.visible = false;
+					nextPosition += 1;
 				}
 			}
-			else if (lett.lett != lettersList[nextPosition] && lett.visible) {
-				gameOver = true;
+			if (lett.box && !my_attacks.charged) {
+				my_attacks.get_charge(lett.Poketype, lett.color);
+				console.log(my_attacks.poke_type, my_attacks.color);
+			}
+			if (my_attacks.charged) {
+				switch(my_attacks.poke_type) {
+					case "Fire":
+							if (lett.box && (lett.Poketype=="Grass" || lett.Poketype=="Ice" || lett.Poketype=="Bug" || lett.Poketype=="Steel")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Water":
+							if (lett.box && (lett.Poketype=="Fire" || lett.Poketype=="Ground" || lett.Poketype=="Rock")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Electric":
+							if (lett.box && (lett.Poketype=="Water" || lett.Poketype=="Flying")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Grass":
+							if (lett.box && (lett.Poketype=="Water" || lett.Poketype=="Ground" || lett.Poketype=="Rock")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Ice":
+							if (lett.box && (lett.Poketype=="Grass" || lett.Poketype=="Ground" || lett.Poketype=="Flying" || lett.Poketype=="Dragon")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Fighting":
+							if (lett.box && (lett.Poketype=="Ice" || lett.Poketype=="Rock" || lett.Poketype=="Dark" || lett.Poketype=="Steel")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Poison":
+							if (lett.box && (lett.Poketype=="Grass" || lett.Poketype=="Fairy")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Ground":
+							if (lett.box && (lett.Poketype=="Fire" || lett.Poketype=="Electric" || lett.Poketype=="Poison" || lett.Poketype=="Rock" || lett.Poketype=="Steel")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Flying":
+							if (lett.box && (lett.Poketype=="Grass" || lett.Poketype=="Fighting" || lett.Poketype=="Bug")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Psychic":
+							if (lett.box && (lett.Poketype=="Fighting" || lett.Poketype=="Poison")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Bug":
+							if (lett.box && (lett.Poketype=="Grass" || lett.Poketype=="Psychic" || lett.Poketype=="Dark")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Rock":
+							if (lett.box && (lett.Poketype=="Fire" || lett.Poketype=="Ice" || lett.Poketype=="Flying" || lett.Poketype=="Bug")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Ghost":
+							if (lett.box && (lett.Poketype=="Psychic" || lett.Poketype=="Ghost")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Dragon":
+							if (lett.box && (lett.Poketype=="Dragon")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Dark":
+							if (lett.box && (lett.Poketype=="Psychic" || lett.Poketype=="Ghost")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Steel":
+							if (lett.box && (lett.Poketype=="Ice" || lett.Poketype=="Rock" || lett.Poketype=="Fairy")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+					case "Fairy":
+							if (lett.box && (lett.Poketype=="Fighting" || lett.Poketype=="Dragon" || lett.Poketype=="Dark")) {
+								lett.box = false;
+								my_attacks.use_charge();
+							}
+						break;
+				}
 			}
 		}
 	}
@@ -357,6 +518,11 @@ function updateGameArea() {
 	token.newSpeed();
 	token.newPos();
 	token.update();
+	my_attacks.update();
+//	p1.update();
+//	p2.update();
+//	o1.update();
+//	o2.update();
 	for (i = 0; i< letters.length; i++) {
 		token.hitLetter(letters[i]);
 		letters[i].update();
@@ -365,15 +531,8 @@ function updateGameArea() {
 	ctx.font = "30pt Arial";
 	ctx.fillStyle = color;
 	for (i = 0; i<nextPosition; i++) {
-	ctx.fillText(lettersList[i], i*w2, ctx.canvas.height);
+	ctx.fillText(lettersList[i], i*w, ctx.canvas.height);
 	}
-	if (gameOver) {
-		ctx = myGameArea.context;
-		ctx.font = "60pt Arial";
-		ctx.fillStyle = "red";
-		ctx.fillText("GAME OVER", 100, ground/2);
-	}
-
 }
 
 function jump(event) {
@@ -387,12 +546,12 @@ function sideways(event) {
 	if ((event.keyCode == 65 || event.keyCode == 37)) {
 //	if ((token.jumping==false) && (event.keyCode == 65 || event.keyCode == 37)) {
 		token.movingSideways = true;
-		token.speedX = -4;
+		token.speedX = -8;
 	}
 	if ((event.keyCode == 68 || event.keyCode == 39)) {
 //	if ((token.jumping==false) && (event.keyCode == 68 || event.keyCode == 39)) {
 		token.movingSideways = true;
-		token.speedX = 4;
+		token.speedX = 8;
 	}
 }
 
