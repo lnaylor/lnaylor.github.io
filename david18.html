@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title> Happy Birthday David! </title>
+
+</head>
+
+<body onload="startGame()"
+	background='lemon'>
+<script type="text/javascript">
+
+var pWidth = 400;
+var pHeight = 20;
+
+var oWidth = 200;
+var oHeight = 10;
+
+var a = 300;
+var b = 50;
+var token;
+var p1;
+var p2;
+var w = 270;
+var w2 = 70;
+var ground = 2*(screen.height/3);
+var lettersList = ['H', 'A', 'P', 'P', 'Y', 'B', 'I', 'R', 'T', 'H', 'D', 'A', 'Y', 'D', 'A', 'V', 'I', 'D', '!'];
+var letters = [];
+var j = [];
+var uncovered = [];
+var color = "purple";
+var obsColor = "red";
+var letterHeight = 100;
+var pxList = [50, 450];
+var pyList = [425, 230];
+var pList;
+var oxList = [0, 300];
+var oyList = [300, 75];
+var oList;
+var nextPosition;
+var total_width = 20*w;
+var gameOver = false;
+var movingSpeed = -2;
+var lettersRevealed = 0;
+
+function startGame() {
+	token = new component(30, 30, color, 10, ground-30);
+//	p1 = new platform(pxList[0], pyList[0]);
+//	p2 = new platform(pxList[1], pyList[1]);
+//	o1 = new obstacle(oxList[0], oyList[0]);
+//	o2 = new obstacle(oxList[1], oyList[1]);
+//	pList = [p1, p2];
+//	oList = [o1, o2];
+	for (k=0; k<lettersList.length; k++) {
+		j.push(k);
+	}
+	for (l in lettersList) {
+		var r = Math.floor(Math.random() * (j.length));
+		letters.push(new letter(lettersList[l], j[r]));
+		j.splice(r, 1);	
+	}	
+	nextPosition = 0;
+	myGameArea.start();
+}
+
+var myGameArea = {
+	canvas : document.createElement("canvas"),
+	start : function() {
+		this.canvas.width = window.innerWidth-20;
+		this.canvas.height= window.innerHeight-20;
+		this.context = this.canvas.getContext("2d");
+		document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+		this.interval = setInterval(updateGameArea, 20);
+	},
+	clear : function() {
+		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+	
+}
+document.addEventListener("keypress", jump);
+window.addEventListener("keydown", sideways);
+window.addEventListener("keyup", stop);
+
+
+function measureText(text, font, size) {
+	var str = text + ':' + font + ':' + size;
+	if (typeof(_measuretext_cache__) == 'object' && __measuretext_cache__[str]) {
+		return __measuretext_cache__[str];
+	}
+
+	var div = document.createElement('DIV');
+		div.innerHTML = text;
+		div.style.position = 'absolute';
+		div.style.top = '-100px';
+		div.style.left = '-100px';
+		div.style.fontFamily = font;
+		div.style.fontWeight = 'normal';
+		div.style.fontSize = size + 'pt';
+	document.body.appendChild(div);
+
+	var size = [div.offsetWidth, div.offsetHeight];
+
+	document.body.removeChild(div);
+	
+	if (typeof(__measurement_cache__) != 'object') {
+		__measuretext_cache__ = [];
+	}
+	__measuretext_cache__[str] = size;
+	
+	return size;
+}
+
+
+function letter(lett, position) {
+	this.visible = true;
+	this.lett = lett;
+	this.position = position;
+	this.lettHeight = ground;
+	this.x = (this.position)*(w)+200;
+	this.y = this.lettHeight;
+	this.speedX = -2;
+	this.update = function() {
+		ctx = myGameArea.context;
+		ctx.font = "30pt Arial";
+		this.height = measureText(this.lett, 'Arial', 30)[1];
+		this.width = measureText(this.lett, 'Arial', 30)[0] +30;
+		if (gameOver == false) {
+			this.speedX = movingSpeed;
+		}
+		ctx.fillStyle = color; 
+			
+		if (this.visible) {
+			temp = this.x+this.speedX;
+			if (temp>0) {
+				this.x = temp;
+			}
+			else {
+				this.x = (total_width +temp); 
+			}
+			ctx.fillText(this.lett, this.x,  this.y);
+		}
+		else {
+			this.speedX = 0;
+		}
+		if (gameOver) {
+			this.speedX = 0;
+		}
+	}
+}
+
+function platform(xPos, yPos) {
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.speedX = 0;
+		this.speedY = 0;
+		this.movingRight = true;
+		
+		this.update = function() {
+			ctx = myGameArea.context;
+			if (this.movingRight) {
+				if (this.xPos+pWidth < ctx.canvas.width) {
+					this.speedX = 2.5;
+				}
+				else {
+					this.movingRight = false;
+				}
+			}
+			else {
+				if (this.xPos > 0) {
+					this.speedX = -2.5
+				}
+				else {
+					this.movingRight = true;
+				}
+			}
+			this.xPos += this.speedX;
+			ctx.fillStyle = color;
+			ctx.fillRect(this.xPos, this.yPos, pWidth, pHeight);
+		}	
+}
+
+function obstacle(xPos, yPos) {
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.movingRight = false;
+		
+		this.update = function() {
+			ctx = myGameArea.context;
+			if (this.movingRight) {
+				if (this.xPos+oWidth < ctx.canvas.width) {
+					this.xPos += 5;
+				}
+				else {
+					this.movingRight = false;
+				}
+			}
+			else {
+				if (this.xPos > 0) {
+					this.xPos -= 5;
+				}
+				else {
+					this.movingRight = true;
+				}
+			}
+			ctx.fillStyle = obsColor;
+			ctx.fillRect(this.xPos, this.yPos, oWidth, oHeight);
+		}	
+}
+
+function component(width, height, color, x, y) {
+	this.width = width;
+	this.height = height;
+	this.x = x;
+	this.y = y;
+	this.speedX = 0;
+	this.speedY = 0;
+	this.movingSideways = false;
+	this.jumping = false;
+	this.onPlatform = false;
+	this.onGround = true;
+	this.d = new Date();
+	this.update = function() {
+
+		ctx = myGameArea.context;
+		ctx.fillStyle = color;
+		ctx.fillRect(this.x, this.y, this.width, this.height);
+	}
+
+	this.newSpeed = function() {
+		if (this.jumping) {
+			this.onPlatform = false;
+			this.onGround = false;
+			currentTime = new Date();
+			var t = (currentTime - this.d.getTime())/1000;
+			this.speedY = 19*t-14;
+		}	
+		if ((this.y)+(this.height) > ground) {
+			this.speedY = 0;
+			this.y = ground-this.height;
+			this.jumping = false;
+			this.onGround = true;
+		}
+		if ((this.y) < 0) {
+			this.speedY = -this.speedY;
+			this.jumping = false;
+		}
+		if ((this.x) < 0) {
+			this.speedX = 0;
+			this.x = 0;
+		}	
+		if ((this.x)+(this.width) > myGameArea.context.canvas.width) {
+			this.speedX = 0;
+			this.x = myGameArea.context.canvas.width - this.width;
+		}
+//		for (i = 0; i < oList.length; i++) {
+//			if ((this.x<oList[i].xPos+oWidth) && (this.x+this.width>oList[i].xPos) && (this.y<oList[i].yPos+oHeight) && (this.y+this.height>oList[i].yPos)) {
+//				this.y = ground-this.height;
+//				this.speedY = 0;
+//				this.speedX = 0;
+//				this.onPlatform = false;
+//				this.movingSideways = false;
+//				this.onGround = true;
+//				this.jumping = false;
+//			}
+//		}
+		var foundPlatform = false;
+//		for (i = 0; i< pList.length; i++) {
+//			if ((this.x < (pList[i].xPos+pWidth)) && (((this.x)+(this.width)) > pList[i].xPos) && (this.y+(this.height) > pList[i].yPos) && (this.y+(this.height) < (pList[i].yPos+pHeight))) {
+//				this.onPlatform = true;
+//				this.speedY = 0;
+//				this.jumping = false;
+//				this.y = pList[i].yPos-this.height;
+//				foundPlatform = true;
+//				if (!this.movingSideways) {
+//					this.speedX = pList[i].speedX;
+//				}
+//			}
+//			else {
+//				this.onPlatform = false;
+//			}
+//			if ((this.x < (pList[i].xPos+pWidth)) && (((this.x)+(this.width)) > pList[i].xPos) && (this.y+(this.height) >= pList[i].yPos) && (this.y+(this.height) < (pList[i].yPos+pHeight))) {
+//				foundPlatform = true;
+//				this.onPlatform = true;
+//				if (!this.movingSideways) {
+//					this.speedX = pList[i].speedX;
+//				}
+//			}
+//			if ((this.x < (pList[i].xPos+pWidth)) && (((this.x)+(this.width)) > pList[i].xPos) && (this.y <= pList[i].yPos+pHeight) && (this.y+this.height > pList[i].yPos+pHeight)) {
+//				currentTime = new Date();
+//				var t = (currentTime - this.d.getTime())/1000;
+//				this.speedY = 3*t;
+//				this.jumping = false;
+//			}	
+//		}
+		if ((!this.onGround) && (!this.onPlatform) && (!this.jumping)  && (!foundPlatform)) {
+			currentTime = new Date();
+			var t = (currentTime - this.d.getTime())/1000;
+			this.speedY = 3*t;
+		}
+	}
+	this.newPos = function() {
+		this.x += this.speedX;
+		this.y += this.speedY;
+	}
+	this.hitLetter = function(lett) {
+		var left1 = this.x;
+		var right1 = this.x + (this.width);
+		var top1 = this.y;
+		var bottom1 = this.y + (this.height);
+		var left2 = lett.x;
+		var right2 = left2 + (lett.width) - 30;
+		var top2 = lett.y-lett.height;
+		var bottom2 = lett.y;
+		if (((bottom1 > top2) && (top1<bottom2) && (left1 < right2) && (right1 > left2))) {
+			if (lett.lett == lettersList[nextPosition] && lett.visible && !gameOver) {
+				lett.visible = false;
+				nextPosition += 1;
+				lettersRevealed += 1;
+
+
+				if (lettersRevealed > 18) {
+					movingSpeed = -14;
+				}
+				else if (lettersRevealed > 17) {
+					movingSpeed = -12.5;
+				}
+				else if (lettersRevealed > 16) {
+					movingSpeed = -11;
+				}
+				else if (lettersRevealed > 15) {
+					movingSpeed = -9.5;
+				}
+				else if (lettersRevealed > 14) {
+					movingSpeed = -8;
+				}
+				else if (lettersRevealed > 12) {
+					movingSpeed = -6.5;
+				}
+				else if (lettersRevealed > 9) {
+					movingSpeed = -5;
+				}
+				else if (lettersRevealed > 4) {
+					movingSpeed = -3.5;
+				}
+			}
+			else if (lett.lett != lettersList[nextPosition] && lett.visible) {
+				gameOver = true;
+			}
+		}
+	}
+}
+
+
+function updateGameArea() {
+	myGameArea.clear();
+	token.newSpeed();
+	token.newPos();
+	token.update();
+	for (i = 0; i< letters.length; i++) {
+		token.hitLetter(letters[i]);
+		letters[i].update();
+	}
+	ctx = myGameArea.context;
+	ctx.font = "30pt Arial";
+	ctx.fillStyle = color;
+	for (i = 0; i<nextPosition; i++) {
+	ctx.fillText(lettersList[i], i*w2, ctx.canvas.height);
+	}
+	if (gameOver) {
+		ctx = myGameArea.context;
+		ctx.font = "60pt Arial";
+		ctx.fillStyle = "red";
+		ctx.fillText("GAME OVER", 100, ground/2);
+	}
+
+}
+
+function jump(event) {
+	if (event.keyCode == 32 && token.jumping==false) {
+		token.jumping = true;	
+		token.d = new Date();
+	}
+}
+
+function sideways(event) {
+	if ((event.keyCode == 65 || event.keyCode == 37)) {
+//	if ((token.jumping==false) && (event.keyCode == 65 || event.keyCode == 37)) {
+		token.movingSideways = true;
+		token.speedX = -4;
+	}
+	if ((event.keyCode == 68 || event.keyCode == 39)) {
+//	if ((token.jumping==false) && (event.keyCode == 68 || event.keyCode == 39)) {
+		token.movingSideways = true;
+		token.speedX = 4;
+	}
+}
+
+function stop(event) {
+	if (event.keyCode == 68 || event.keyCode == 39 || event.keyCode == 65 || event.keyCode == 37) {
+		token.speedX =0;
+		token.movingSideways = false;
+	}
+}
+
+
+
+
+</script>
+
+
+</body>
+
+</html>
