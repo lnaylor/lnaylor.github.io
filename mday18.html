@@ -2,7 +2,7 @@
 <html>
 
 <head>
-<title> Happy Father's Day! </title>
+<title> Happy Mother's Day! </title>
 
 </head>
 
@@ -24,8 +24,8 @@ var my_attacks;
 var p1;
 var p2;
 var w = 70;
-var ground = 500;
-var lettersList = ['H', 'A', 'P', 'P', 'Y', 'F', 'A', 'T', 'H', 'E', 'R', '\'', 'S', 'D', 'A', 'Y', '!'];
+var ground = 525;
+var lettersList = ['H', 'A', 'P', 'P', 'Y', 'M', 'O', 'T', 'H', 'E', 'R', '\'', 'S', 'D', 'A', 'Y', '!'];
 var typeList = ["Fire", "Water", "Electric", "Grass", "Ice", "Fighting", "Poison", "Ground", "Flying", "Psychic", "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy"];
 var letters = [];
 var j = [];
@@ -41,15 +41,11 @@ var oyList = [300, 75];
 //var oList;
 var nextPosition;
 var tokenSpeed = 5;
-var cHeight=20;
-var cWidth = 20;
-var moving_obj;
 
 
 function startGame() {
-	token = new component(20, 20, color, 10, ground-20);
+	token = new component(20, 20, color, 10, ground-30);
 	my_attacks = new charge();
-	moving_obj = new movingCharge();
 //	p1 = new platform(pxList[0], pyList[0]);
 //	p2 = new platform(pxList[1], pyList[1]);
 //	o1 = new obstacle(oxList[0], oyList[0]);
@@ -84,7 +80,7 @@ var myGameArea = {
 }
 document.addEventListener("keypress", jump);
 document.addEventListener("keydown", changeSpeed);
-//document.addEventListener("keydown", dropCharge);
+document.addEventListener("keydown", dropCharge);
 window.addEventListener("keydown", sideways);
 window.addEventListener("keyup", stop);
 
@@ -94,7 +90,6 @@ function charge() {
 	this.color = null;
 	this.charged = false;
 	this.pending_charge = false;
-	this.just_used = false;
 
 	this.get_charge = function(poke_type, color) {
 		this.pending_charge = true;
@@ -103,7 +98,6 @@ function charge() {
 	}
 	this.use_charge = function() {
 		this.charged = false;
-		this.just_used = true;
 	}
 
 	this.update = function() {
@@ -216,26 +210,25 @@ function letter(lett, position, Poketype) {
 		ctx.fillStyle = color; 
 			
 		if (this.visible) {
+			ctx.beginPath();
+			ctx.fillStyle="black";
+			var ms = measureText(this.Poketype, 'Arial', 10);
+
+			ctx.fillRect((this.position)*(w)-3, this.lettHeight-50-ms[1], ms[0]+6, ms[1]+5);
+			ctx.stroke();
 			ctx.font = "20pt Arial";
 			ctx.fillStyle = color; 
 			ctx.fillText(this.lett, (this.position)*(w)+offset, this.lettHeight);
-		}
-		ctx.beginPath();
-		ctx.fillStyle="black";
-		var ms = measureText(this.Poketype, 'Arial', 10);
-
-		ctx.fillRect((this.position)*(w)-3, this.lettHeight-50-ms[1], ms[0]+6, ms[1]+5);
-		ctx.stroke();
-		ctx.font = "10pt Arial";
-		ctx.fillStyle = "white";
-		ctx.fillText(this.Poketype, (this.position)*(w), this.lettHeight-50);
-		ctx.beginPath();
-		if (this.box==true) {
-			ctx.lineWidth = "2";
-			ctx.strokeStyle=this.color;
-			ctx.rect(this.position*w, this.lettHeight-25, this.width, this.height);
-			ctx.stroke();	
-		
+			ctx.font = "10pt Arial";
+			ctx.fillStyle = "white";
+			ctx.fillText(this.Poketype, (this.position)*(w), this.lettHeight-50);
+			ctx.beginPath();
+			if (this.box==true) {
+				ctx.lineWidth = "2";
+				ctx.strokeStyle=this.color;
+				ctx.rect(this.position*w, this.lettHeight-25, this.width, this.height);
+				ctx.stroke();	
+			}
 		}
 	}
 }
@@ -269,88 +262,6 @@ function platform(xPos, yPos) {
 			ctx.fillStyle = color;
 			ctx.fillRect(this.xPos, this.yPos, pWidth, pHeight);
 		}	
-}
-
-function movingCharge() {
-	var res_ind1 = Math.floor(Math.random() * (typeList.length));
-	this.type = typeList[res_ind1];
-	this.xPos = screen.width;
-	this.yPos = ground-20;
-	this.speedX = -2.5;
-	this.color = "white";
-
-	this.update = function() {
-		ctx = myGameArea.context;
-		if (this.xPos < 0) {
-			var res_ind = Math.floor(Math.random() * (typeList.length));
-			this.type = typeList[res_ind];
-			this.xPos = ctx.canvas.width-10;
-		}
-		this.xPos += this.speedX;
-
-
-
-		switch(this.type) {
-			case "Fire":
-				this.color = "red";
-				break;
-			case "Water":
-				this.color = "blue";
-				break;
-			case "Electric":
-				this.color = "yellow";
-				break;
-			case "Grass":
-				this.color = "green";
-				break;
-			case "Ice":
-				this.color = "aquamarine";
-				break;
-			case "Fighting":
-				this.color = "brown";
-				break;
-			case "Poison":
-				this.color = "purple";
-				break;
-			case "Ground":
-				this.color = "tan";
-				break;
-			case "Flying":
-				this.color = "MediumPurple";
-				break;
-			case "Psychic":
-				this.color = "DeepPink";
-				break;
-			case "Bug":
-				this.color = "YellowGreen";
-				break;
-			case "Rock":
-				this.color = "Tan";
-				break;
-			case "Ghost":
-				this.color = "SlateBlue";
-				break;
-			case "Dragon":
-				this.color = "Indigo";
-				break;
-			case "Dark":
-				this.color = "black";
-				break;
-			case "Steel":
-				this.color = "grey";
-				break;
-			case "Fairy":
-				this.color = "Orchid";
-				break;
-			default:
-				this.color = "black";
-		}
-		ctx.fillStyle = this.color;
-		ctx.fillRect(this.xPos, this.yPos, cWidth, cHeight);
-		ctx.font = "30pt Arial";
-		ctx.fillStyle = this.color;
-		ctx.fillText("Coming up: " + this.type, ctx.canvas.width-500, ctx.canvas.height - letterHeight);
-	}
 }
 
 function obstacle(xPos, yPos) {
@@ -500,7 +411,7 @@ function component(width, height, color, x, y) {
 					nextPosition += 1;
 				}
 			}
-			if (!my_attacks.just_used && !my_attacks.pending_charge && !my_attacks.charged) {
+			if (lett.box && !my_attacks.charged) {
 				my_attacks.get_charge(lett.Poketype, lett.color);
 				console.log(my_attacks.poke_type, my_attacks.color);
 			}
@@ -612,26 +523,6 @@ function component(width, height, color, x, y) {
 			}
 		}
 	}
-
-	this.hitMovingCharge = function(moving_ch, cur_ch) {
-		var left1 = this.x;
-		var right1 = this.x + (this.width);
-		var top1 = this.y;
-		var bottom1 = this.y + (this.height);
-//	ctx.rect(this.position*w, this.lettHeight-25, this.width, this.height);
-		var left2 = moving_ch.xPos; 
-		var right2 = left2 + (cWidth);
-		var top2 = ground-30; 
-		var bottom2 = top2 + cHeight;
-//		ctx = myGameArea.context;
-//		ctx.rect(left2, top2, right2-left2, bottom2-top2);
-//		ctx.stroke();
-		if (((bottom1 > top2) && (top1<bottom2) && (left1 < right2) && (right1 > left2))) {
-			cur_ch.poke_type = moving_ch.type;
-			cur_ch.color = moving_ch.color;
-			cur_ch.charged = true;
-		}
-	}
 }
 
 
@@ -641,11 +532,6 @@ function updateGameArea() {
 	token.newPos();
 	token.update();
 	my_attacks.update();
-	moving_obj.update();
-	token.hitMovingCharge(moving_obj, my_attacks);
-	if (token.y == ground-20 && my_attacks.just_used) {
-		my_attacks.just_used = false;
-	}
 //	p1.update();
 //	p2.update();
 //	o1.update();
@@ -666,6 +552,7 @@ function jump(event) {
 	if (event.keyCode == 32 && token.jumping==false) {
 		token.jumping = true;	
 		token.d = new Date();
+		console.log("JUMPING");
 	}
 }
 
