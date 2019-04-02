@@ -1,7 +1,7 @@
-var target_full = "HAPPYBIRTHDAYMOM!";
-var target = "HAPPYBIRTHDAYMOM!";
+var target_full = "HAPPYBIRTHDAYDAVID!";
+var target = "HAPPYBIRTHDAYDAVID!";
 resetTarget = function() {
-	target = "HAPPYBIRTHDAYMOM!";
+	target = "HAPPYBIRTHDAYDAVID!";
 }
 var message = "";
 var endGame;
@@ -18,6 +18,11 @@ var textSize = "15px Arial";
 var interval = .75;
 var counter = 0;
 var gameWon=false;
+var possible_directions = ['N', 'S', 'E', 'W'];
+var new_direction;
+var new_position;
+var need_new_obs;
+var numObs = 5;
 const WALL = 8;
 const TOKEN = 3;
 const EMPTY = 1;
@@ -59,22 +64,22 @@ var map = {
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 'Y', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 'P', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'H', 2, 2,
-	2, 2, 'O', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 'A', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'Y', 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'D', 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 'H', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'T', 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'M', 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'V', 2,
 	2, 2, 'D', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'B', 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 'P', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 'P', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'I', 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'A', 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 'R', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'A', 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, '!', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 'M', 2, 2, 2, 2, 2, 2, 'I', 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 'D', 2, 2, 2, 2, 2, 2, 'I', 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	], [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -139,12 +144,43 @@ var map = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+	],
+	[
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
 	]],
 	getTile: function(layer, col, row) {
 		return this.layers[layer][row *map.cols + col];
 	}
 };
 
+var getNumObs = function() {
+	var count=0;
+	for (var i =0; i<map.layers[4].length; i++) {
+		if (map.layers[4][i]==OBSTACLE) {
+			count++;
+		}
+	}
+	return count;
+}
 var Keyboard = {};
 
 Keyboard.LEFT = 37;
@@ -274,7 +310,7 @@ Game.update = function(delta) {
 			else if (up_down) {
 				map.tokenRow = new_col_row;
 			}
-			if (layer1== target.charAt(0)) {
+			if (layer1== target.charAt(0) && layer2!=NON_VISIBLE) {
 				message += target.charAt(0);
 				target = target.substr(1);
 				map.layers[2][map.tokenRow*map.cols+map.tokenCol]=NON_VISIBLE;
@@ -294,18 +330,105 @@ Game.update = function(delta) {
 			for (var r=0; r<map.rows; r++) {
 				var tile = map.getTile(4, c, r);
 				if(tile==OBSTACLE && map.layers[3][r*map.cols+c]!=1) {
-					if (c<map.cols-2) {
+				//	if (c<map.cols-2) {
 						map.layers[4][r*map.cols+c]=EMPTY;
-						map.layers[4][r*map.cols+(c+1)] = OBSTACLE;
-						map.layers[3][r*map.cols+(c+1)] = 1;
-					}
-					else if (c==map.cols-2) {
-						map.layers[4][r*map.cols+c]=EMPTY;
-						map.layers[4][r*map.cols+1] = OBSTACLE;
-						map.layers[3][r*map.cols+1] = 1;
-					}
+						need_new_obs = false;
+						if (map.layers[5][r*map.cols+c] == 'N') {
+							if(map.layers[0][(r-1)*map.cols+c] != WALL) {
+								map.layers[4][(r-1)*map.cols+c] = OBSTACLE;
+								map.layers[3][(r-1)*map.cols+c] = 1;
+								map.layers[5][(r-1)*map.cols+c] = 'N';
+							}
+							else {
+								need_new_obs = true;
+							}
+						}
+						if (map.layers[5][r*map.cols+c] == 'S') {
+							if (map.layers[0][(r+1)*map.cols+c] != WALL) {
+								map.layers[4][(r+1)*map.cols+c] = OBSTACLE;
+								map.layers[3][(r+1)*map.cols+c] = 1;
+								map.layers[5][(r+1)*map.cols+c] = 'S';
+							}
+							else {
+								need_new_obs = true;
+							}
+						}
+						if (map.layers[5][r*map.cols+c] == 'E') {
+							if (map.layers[0][r*map.cols+(c+1)] != WALL) {
+								map.layers[4][r*map.cols+(c+1)] = OBSTACLE;
+								map.layers[3][r*map.cols+(c+1)] = 1;
+								map.layers[5][r*map.cols+(c+1)] = 'E';
+							}
+							else {
+								need_new_obs = true;
+							}
+						}
+						if (map.layers[5][r*map.cols+c] == 'W') {
+							if (map.layers[0][r*map.cols+(c-1)] != WALL) {
+								map.layers[4][r*map.cols+(c-1)] = OBSTACLE;
+								map.layers[3][r*map.cols+(c-1)] = 1;
+								map.layers[5][r*map.cols+(c-1)] = 'W';
+							}
+							else {
+								need_new_obs = true;
+							}
+						}
+						if (map.layers[5][r*map.cols+c]==0 || need_new_obs) {
+							new_direction = possible_directions[Math.floor(Math.random()*possible_directions.length)];
+							new_position = Math.floor(Math.random()*map.cols-2)+1;
+							if (new_direction =='N') {
+								map.layers[4][(map.rows-2)*map.cols+new_position] = OBSTACLE;
+								map.layers[5][(map.rows-2)*map.cols+new_position] = 'N';
+								map.layers[3][(map.rows-2)*map.cols+new_position] = 1;
+							}
+							if (new_direction =='S') {
+								map.layers[4][1*map.cols+new_position] = OBSTACLE;
+								map.layers[5][1*map.cols+new_position] = 'S';
+								map.layers[3][1*map.cols+new_position] = 1;
+							}
+							if (new_direction =='E') {
+								map.layers[4][new_position*map.cols+1] = OBSTACLE;
+								map.layers[5][new_position*map.cols+1] = 'E';
+								map.layers[3][new_position*map.cols+1] = 1;
+							}
+							if (new_direction =='W') {
+								map.layers[4][1*map.cols+(map.cols-2)] = OBSTACLE;
+								map.layers[5][1*map.cols+(map.cols-2)] = 'W';
+								map.layers[3][1*map.cols+(map.cols-2)] = 1;
+							}
+
+						}
+						map.layers[5][r*map.cols+c] = 0;
+						
+				//	}
+				//	else if (c==map.cols-2) {
+				//		map.layers[4][r*map.cols+c]=EMPTY;
+				//		map.layers[4][r*map.cols+1] = OBSTACLE;
+				//		map.layers[3][r*map.cols+1] = 1;
+				//	}
 				}
 			}
+		}
+		for (var i =0; i< numObs-getNumObs(); i++) {
+			new_direction = possible_directions[Math.floor(Math.random()*possible_directions.length)];
+			new_position = Math.floor(Math.random()*map.cols-2)+1;
+			if (new_direction =='N') {
+				map.layers[4][(map.rows-2)*map.cols+new_position] = OBSTACLE;
+				map.layers[5][(map.rows-2)*map.cols+new_position] = 'N';
+			}
+			if (new_direction =='S') {
+				map.layers[4][1*map.cols+new_position] = OBSTACLE;
+				map.layers[5][1*map.cols+new_position] = 'S';
+			}
+			if (new_direction =='E') {
+				map.layers[4][new_position*map.cols+1] = OBSTACLE;
+				map.layers[5][new_position*map.cols+1] = 'E';
+			}
+			if (new_direction =='W') {
+				map.layers[4][1*map.cols+(map.cols-2)] = OBSTACLE;
+				map.layers[5][1*map.cols+(map.cols-2)] = 'W';
+			}
+
 		}
 		counter=0;
 	}
@@ -366,7 +489,7 @@ Game.render = function() {
 	this.msg_ctx.fillStyle="purple";
 	if (message.valueOf()=="HAPPY") {message+=" ";}
 	if (message.valueOf()=="HAPPY BIRTHDAY") {message+=" ";}
-	if (message.valueOf()=="HAPPY BIRTHDAY MOM!") {
+	if (message.valueOf()=="HAPPY BIRTHDAY DAVID!") {
 		gameWon=true;
 	}
 	this.msg_ctx.fillText(message, 5, 50);
