@@ -1,7 +1,7 @@
-var target_full = "HAPPYBIRTHDAYDAVID!";
-var target = "HAPPYBIRTHDAYDAVID!";
+var target_full = "HAPPYMOTHER'SDAY!";
+var target = "HAPPYMOTHER'SDAY!";
 resetTarget = function() {
-	target = "HAPPYBIRTHDAYDAVID!";
+	target = "HAPPYMOTHER'SDAY!";
 }
 var message = "";
 var endGame;
@@ -23,6 +23,8 @@ var new_direction;
 var new_position;
 var need_new_obs;
 var numObs = 5;
+var hitRow = 0;
+var hitCol = 0;
 const WALL = 8;
 const TOKEN = 3;
 const EMPTY = 1;
@@ -62,24 +64,24 @@ var map = {
 	8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
 	], [
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 'Y', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 'P', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'H', 2, 2,
-	2, 2, 'A', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'Y', 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'D', 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 'H', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'T', 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'V', 2,
-	2, 2, 'D', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'B', 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 'P', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'I', 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'A', 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 'R', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 'A', 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, '!', 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 'D', 2, 2, 2, 2, 2, 2, 'I', 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	], [
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -181,6 +183,27 @@ var getNumObs = function() {
 	}
 	return count;
 }
+var randomizeLetters = function() {
+	var openSpot;
+	for (var r=0;r<map.rows;r++) {
+		for (var c=0;c<map.cols;c++) {
+			map.layers[1][r*map.cols+c] = 2;
+			map.layers[2][r*map.cols+c] = 0;
+		}
+	}
+	for (var i=0; i<target.length; i++) {
+		openSpot = false;
+		while (!openSpot) {
+			var j = Math.floor(Math.random() * Math.floor(map.cols-2))+1;
+			var k = Math.floor(Math.random() * Math.floor(map.rows-2))+1;
+			if (map.getTile(0, k, j) != 3 && map.getTile(1, k, j) ==2) {
+				map.layers[1][k*map.cols+j] = target.charAt(i);
+				map.layers[2][k*map.cols+j] = 0;
+				openSpot = true;
+			}
+		}
+	}
+}
 var Keyboard = {};
 
 Keyboard.LEFT = 37;
@@ -228,6 +251,7 @@ Game.run = function(context, msg_ctx) {
 	this.ctx = context;
 	this.msg_ctx = msg_ctx;
 	this._previousElapsed=0;
+	randomizeLetters();
 
 	var p = this.load();
 		this.init();
@@ -262,26 +286,35 @@ Game.reset = function() {
 	map.tokenCol=1;
 	map.tokenRow=18;
 	map.layers[0][map.tokenRow*map.cols+map.tokenCol]=3;
+	randomizeLetters();
 
 };
 
 Game.update = function(delta) {
 	if (Keyboard.isDown(Keyboard.LEFT)) {
+		hitRow = 0;
+		hitCol = 0;
 		new_col_row = Math.max(0, map.tokenCol-1);
 		left_right = true;
 		Keyboard._keys[Keyboard.LEFT] = false;
 	}
 	if (Keyboard.isDown(Keyboard.RIGHT)) {
+		hitRow = 0;
+		hitCol = 0;
 		new_col_row = Math.min(map.cols-1, map.tokenCol+1);
 		left_right = true;
 		Keyboard._keys[Keyboard.RIGHT] = false;
 	}
 	if (Keyboard.isDown(Keyboard.UP)) {
+		hitRow = 0;
+		hitCol = 0;
 		new_col_row = Math.max(0, map.tokenRow-1);
 		up_down = true;
 		Keyboard._keys[Keyboard.UP] = false;
 	}
 	if(Keyboard.isDown(Keyboard.DOWN)) {
+		hitRow = 0;
+		hitCol = 0;
 		new_col_row = Math.min(map.rows-1, map.tokenRow+1);
 		up_down = true;
 		Keyboard._keys[Keyboard.DOWN] = false;
@@ -322,8 +355,13 @@ Game.update = function(delta) {
 
 	}
 	if(map.layers[4][map.tokenRow*map.cols + map.tokenCol]==OBSTACLE) {
-		Game.reset();
-		endGame=true;
+		//Game.reset();
+		//endGame=true;
+		if (map.tokenRow!=hitRow && map.tokenCol!=hitCol) {
+			randomizeLetters();
+			hitRow = map.tokenRow;
+			hitCol = map.hitCol;
+		}
 	}
 	if (counter > interval&&!gameWon) {
 		for (var c=0; c<map.cols; c++) {
@@ -488,8 +526,8 @@ Game.render = function() {
 	this.msg_ctx.font="30px Arial";
 	this.msg_ctx.fillStyle="purple";
 	if (message.valueOf()=="HAPPY") {message+=" ";}
-	if (message.valueOf()=="HAPPY BIRTHDAY") {message+=" ";}
-	if (message.valueOf()=="HAPPY BIRTHDAY DAVID!") {
+	if (message.valueOf()=="HAPPY MOTHER'S") {message+=" ";}
+	if (message.valueOf()=="HAPPY MOTHER'S DAY!") {
 		gameWon=true;
 	}
 	this.msg_ctx.fillText(message, 5, 50);
