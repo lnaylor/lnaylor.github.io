@@ -1,7 +1,7 @@
-var target_full = "HAPPYMOTHER'SDAY!";
-var target = "HAPPYMOTHER'SDAY!";
+var target_full = "HAPPYFATHER'SDAY!";
+var target = "HAPPYFATHER'SDAY!";
 resetTarget = function() {
-	target = "HAPPYMOTHER'SDAY!";
+	target = "HAPPYFATHER'SDAY!";
 }
 var message = "";
 var endGame;
@@ -129,20 +129,20 @@ var map = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -178,6 +178,16 @@ var getNumObs = function() {
 	var count=0;
 	for (var i =0; i<map.layers[4].length; i++) {
 		if (map.layers[4][i]==OBSTACLE) {
+			count++;
+		}
+	}
+	return count;
+}
+
+var getNumObs4 = function() {
+	var count=0;
+	for (var i =0; i<map.layers[4].length; i++) {
+		if (map.layers[4][i]==4) {
 			count++;
 		}
 	}
@@ -363,17 +373,22 @@ Game.update = function(delta) {
 			hitCol = map.hitCol;
 		}
 	}
+	if(map.layers[4][map.tokenRow*map.cols + map.tokenCol]==4) {
+		Game.reset();
+		endGame=true;
+	}
+
 	if (counter > interval&&!gameWon) {
 		for (var c=0; c<map.cols; c++) {
 			for (var r=0; r<map.rows; r++) {
 				var tile = map.getTile(4, c, r);
-				if(tile==OBSTACLE && map.layers[3][r*map.cols+c]!=1) {
+				if((tile==OBSTACLE || tile==4) && map.layers[3][r*map.cols+c]!=1) {
 				//	if (c<map.cols-2) {
 						map.layers[4][r*map.cols+c]=EMPTY;
 						need_new_obs = false;
 						if (map.layers[5][r*map.cols+c] == 'N') {
 							if(map.layers[0][(r-1)*map.cols+c] != WALL) {
-								map.layers[4][(r-1)*map.cols+c] = OBSTACLE;
+								map.layers[4][(r-1)*map.cols+c] = tile;
 								map.layers[3][(r-1)*map.cols+c] = 1;
 								map.layers[5][(r-1)*map.cols+c] = 'N';
 							}
@@ -383,7 +398,7 @@ Game.update = function(delta) {
 						}
 						if (map.layers[5][r*map.cols+c] == 'S') {
 							if (map.layers[0][(r+1)*map.cols+c] != WALL) {
-								map.layers[4][(r+1)*map.cols+c] = OBSTACLE;
+								map.layers[4][(r+1)*map.cols+c] = tile;
 								map.layers[3][(r+1)*map.cols+c] = 1;
 								map.layers[5][(r+1)*map.cols+c] = 'S';
 							}
@@ -393,7 +408,7 @@ Game.update = function(delta) {
 						}
 						if (map.layers[5][r*map.cols+c] == 'E') {
 							if (map.layers[0][r*map.cols+(c+1)] != WALL) {
-								map.layers[4][r*map.cols+(c+1)] = OBSTACLE;
+								map.layers[4][r*map.cols+(c+1)] = tile;
 								map.layers[3][r*map.cols+(c+1)] = 1;
 								map.layers[5][r*map.cols+(c+1)] = 'E';
 							}
@@ -403,7 +418,7 @@ Game.update = function(delta) {
 						}
 						if (map.layers[5][r*map.cols+c] == 'W') {
 							if (map.layers[0][r*map.cols+(c-1)] != WALL) {
-								map.layers[4][r*map.cols+(c-1)] = OBSTACLE;
+								map.layers[4][r*map.cols+(c-1)] = tile;
 								map.layers[3][r*map.cols+(c-1)] = 1;
 								map.layers[5][r*map.cols+(c-1)] = 'W';
 							}
@@ -415,22 +430,22 @@ Game.update = function(delta) {
 							new_direction = possible_directions[Math.floor(Math.random()*possible_directions.length)];
 							new_position = Math.floor(Math.random()*map.cols-2)+1;
 							if (new_direction =='N') {
-								map.layers[4][(map.rows-2)*map.cols+new_position] = OBSTACLE;
+								map.layers[4][(map.rows-2)*map.cols+new_position] = tile;
 								map.layers[5][(map.rows-2)*map.cols+new_position] = 'N';
 								map.layers[3][(map.rows-2)*map.cols+new_position] = 1;
 							}
 							if (new_direction =='S') {
-								map.layers[4][1*map.cols+new_position] = OBSTACLE;
+								map.layers[4][1*map.cols+new_position] = tile;
 								map.layers[5][1*map.cols+new_position] = 'S';
 								map.layers[3][1*map.cols+new_position] = 1;
 							}
 							if (new_direction =='E') {
-								map.layers[4][new_position*map.cols+1] = OBSTACLE;
+								map.layers[4][new_position*map.cols+1] = tile;
 								map.layers[5][new_position*map.cols+1] = 'E';
 								map.layers[3][new_position*map.cols+1] = 1;
 							}
 							if (new_direction =='W') {
-								map.layers[4][1*map.cols+(map.cols-2)] = OBSTACLE;
+								map.layers[4][1*map.cols+(map.cols-2)] = tile;
 								map.layers[5][1*map.cols+(map.cols-2)] = 'W';
 								map.layers[3][1*map.cols+(map.cols-2)] = 1;
 							}
@@ -468,6 +483,28 @@ Game.update = function(delta) {
 			}
 
 		}
+		for (var i =0; i< numObs-getNumObs4(); i++) {
+			new_direction = possible_directions[Math.floor(Math.random()*possible_directions.length)];
+			new_position = Math.floor(Math.random()*map.cols-2)+1;
+			
+			if (new_direction =='N') {
+				map.layers[4][(map.rows-2)*map.cols+new_position] = 4;
+				map.layers[5][(map.rows-2)*map.cols+new_position] = 'N';
+			}
+			if (new_direction =='S') {
+				map.layers[4][1*map.cols+new_position] = 4;
+				map.layers[5][1*map.cols+new_position] = 'S';
+			}
+			if (new_direction =='E') {
+				map.layers[4][new_position*map.cols+1] = 4;
+				map.layers[5][new_position*map.cols+1] = 'E';
+			}
+			if (new_direction =='W') {
+				map.layers[4][1*map.cols+(map.cols-2)] = 4;
+				map.layers[5][1*map.cols+(map.cols-2)] = 'W';
+			}
+
+		}
 		counter=0;
 	}
 	counter+=delta;
@@ -498,11 +535,16 @@ Game._drawLayer = function(layer) {
 			}
 			else if(layer==4) {
 				if (tile==7) {
+					this.ctx.fillStyle="blue";
+					this.ctx.fillRect(c*map.tsize, r*map.tsize, map.tsize, map.tsize);
+				}
+				else if (tile==4) {
 					this.ctx.fillStyle="black";
 					this.ctx.fillRect(c*map.tsize, r*map.tsize, map.tsize, map.tsize);
 				}
 
 			}
+					
 			
 			else {
 				if (typeof tile == "string"){
@@ -526,8 +568,8 @@ Game.render = function() {
 	this.msg_ctx.font="30px Arial";
 	this.msg_ctx.fillStyle="purple";
 	if (message.valueOf()=="HAPPY") {message+=" ";}
-	if (message.valueOf()=="HAPPY MOTHER'S") {message+=" ";}
-	if (message.valueOf()=="HAPPY MOTHER'S DAY!") {
+	if (message.valueOf()=="HAPPY FATHER'S") {message+=" ";}
+	if (message.valueOf()=="HAPPY FATHER'S DAY!") {
 		gameWon=true;
 	}
 	this.msg_ctx.fillText(message, 5, 50);
