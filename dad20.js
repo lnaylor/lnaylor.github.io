@@ -1,7 +1,7 @@
-var target_full = "HAPPYFATHER'SDAY!";
-var target = "HAPPYFATHER'SDAY!";
+var target_full = "HAPPYBIRTHDAYDAD!";
+var target = "HAPPYBIRTHDAYDAD!"; 
 resetTarget = function() {
-	target = "HAPPYFATHER'SDAY!";
+	target = "HAPPYBIRTHDAYDAD!";
 }
 var message = "";
 var endGame;
@@ -34,6 +34,7 @@ const NON_VISIBLE = 1;
 const TOK_COL = 1;
 const TOK_ROW = 8;
 const OBSTACLE = 7;
+const R_OBSTACLE = 9;
 
 var map = {
 	cols:20,
@@ -130,9 +131,9 @@ var map = {
 	0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -144,7 +145,7 @@ var map = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
 	],
 	[
@@ -188,6 +189,15 @@ var getNumObs4 = function() {
 	var count=0;
 	for (var i =0; i<map.layers[4].length; i++) {
 		if (map.layers[4][i]==4) {
+			count++;
+		}
+	}
+	return count;
+}
+var getNumObs9 = function() {
+	var count=0;
+	for (var i =0; i<map.layers[4].length; i++) {
+		if (map.layers[4][i]==9) {
 			count++;
 		}
 	}
@@ -373,6 +383,19 @@ Game.update = function(delta) {
 			hitCol = map.hitCol;
 		}
 	}
+	if(map.layers[4][map.tokenRow*map.cols + map.tokenCol]==R_OBSTACLE) {
+		//Game.reset();
+		//endGame=true;
+		if (map.tokenRow!=hitRow && map.tokenCol!=hitCol) {
+			map.layers[0][map.tokenRow*map.cols+map.tokenCol]=1;
+			map.tokenCol=1;
+			map.tokenRow=18;
+			map.layers[0][map.tokenRow*map.cols+map.tokenCol]=3;
+
+			hitRow = map.tokenRow;
+			hitCol = map.hitCol;
+		}
+	}
 	if(map.layers[4][map.tokenRow*map.cols + map.tokenCol]==4) {
 		Game.reset();
 		endGame=true;
@@ -382,7 +405,7 @@ Game.update = function(delta) {
 		for (var c=0; c<map.cols; c++) {
 			for (var r=0; r<map.rows; r++) {
 				var tile = map.getTile(4, c, r);
-				if((tile==OBSTACLE || tile==4) && map.layers[3][r*map.cols+c]!=1) {
+				if((tile==OBSTACLE || tile==4 || tile==R_OBSTACLE) && map.layers[3][r*map.cols+c]!=1) {
 				//	if (c<map.cols-2) {
 						map.layers[4][r*map.cols+c]=EMPTY;
 						need_new_obs = false;
@@ -505,6 +528,28 @@ Game.update = function(delta) {
 			}
 
 		}
+		for (var i =0; i< numObs-getNumObs9(); i++) {
+			new_direction = possible_directions[Math.floor(Math.random()*possible_directions.length)];
+			new_position = Math.floor(Math.random()*map.cols-2)+1;
+			
+			if (new_direction =='N') {
+				map.layers[4][(map.rows-2)*map.cols+new_position] = 9;
+				map.layers[5][(map.rows-2)*map.cols+new_position] = 'N';
+			}
+			if (new_direction =='S') {
+				map.layers[4][1*map.cols+new_position] = 9;
+				map.layers[5][1*map.cols+new_position] = 'S';
+			}
+			if (new_direction =='E') {
+				map.layers[4][new_position*map.cols+1] = 9;
+				map.layers[5][new_position*map.cols+1] = 'E';
+			}
+			if (new_direction =='W') {
+				map.layers[4][1*map.cols+(map.cols-2)] = 9;
+				map.layers[5][1*map.cols+(map.cols-2)] = 'W';
+			}
+
+		}
 		counter=0;
 	}
 	counter+=delta;
@@ -542,6 +587,10 @@ Game._drawLayer = function(layer) {
 					this.ctx.fillStyle="black";
 					this.ctx.fillRect(c*map.tsize, r*map.tsize, map.tsize, map.tsize);
 				}
+				else if (tile==9) {
+					this.ctx.fillStyle="orange";
+					this.ctx.fillRect(c*map.tsize, r*map.tsize, map.tsize, map.tsize);
+				}
 
 			}
 					
@@ -568,8 +617,8 @@ Game.render = function() {
 	this.msg_ctx.font="30px Arial";
 	this.msg_ctx.fillStyle="purple";
 	if (message.valueOf()=="HAPPY") {message+=" ";}
-	if (message.valueOf()=="HAPPY FATHER'S") {message+=" ";}
-	if (message.valueOf()=="HAPPY FATHER'S DAY!") {
+	if (message.valueOf()=="HAPPY BIRTHDAY") {message+=" ";}
+	if (message.valueOf()=="HAPPY BIRTHDAY DAD!") {
 		gameWon=true;
 	}
 	this.msg_ctx.fillText(message, 5, 50);
