@@ -1,22 +1,29 @@
-var messageOrder = "HAPPYBIRTHDAYMOM";
+var messageOrder = "HAPPYBIRTHDAYDAVID";
 var count=0;
-var message="HAPPYBIRTHDAYMOM";
+var message="HAPPYBIRTHDAYDAVIDHAPPYBIRTHDAYDAVID";
 var context = document.getElementById('screen').getContext('2d');
 var msg_ctx = document.getElementById('message').getContext('2d');
+var currentTile=null;
+var currentLetter="Q";
+var blocked=false;
 
 const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
 const wipe = async (tiles) => {
+	blocked=true;
   	await sleep(1000)
- 	count=0;
+
 				for (var j = 0; j<tiles.length;j++) {
-					tiles[j].isFaceUp=false;
-					tiles[j].draw();
+					if (!tiles[j].isPermanent) {
+						tiles[j].isFaceUp=false;
+						tiles[j].draw();
+					}
 				}
-				msg_ctx.fillStyle="white";
-				msg_ctx.fillRect(0,0,640, 80);
+				//msg_ctx.fillStyle="white";
+				//msg_ctx.fillRect(0,0,640, 80);
+	blocked=false;
 }
 
 String.prototype.shuffle = function () {
@@ -37,6 +44,7 @@ var Tile = function(x, y, letter) {
 	this.y = y;
 	this.width=50;
 	this.isFaceUp=false;
+	this.isPermanent=false;
 	this.letter=letter;
 };
 Tile.prototype.draw = function() {
@@ -69,9 +77,9 @@ Game.init = function() {
 
 Game.drawBoard = function() {
 	var tiles = [];
-	for (var i =0; i<4; i++) {
-		for (var j=0; j<4; j++) {
-			tiles.push(new Tile(i*55, j*55, message.charAt((i*4)+j)));
+	for (var i =0; i<6; i++) {
+		for (var j=0; j<6; j++) {
+			tiles.push(new Tile(i*55, j*55, message.charAt((i*6)+j)));
 		}
 	}
 	
@@ -79,14 +87,24 @@ Game.drawBoard = function() {
 		tiles[i].draw();
 	}
 	document.querySelector('#screen').onclick = function(event) {
-	for (var i = 0; i<tiles.length;i++) {
+	if (!blocked) {
+			for (var i = 0; i<tiles.length;i++) {
 		if (event.clientX > tiles[i].x && event.clientX < tiles[i].x+tiles[i].width && event.clientY > tiles[i].y && event.clientY < tiles[i].y+tiles[i].width) {
 			tiles[i].isFaceUp=true;
 			tiles[i].draw();
-			if ((messageOrder.charAt(count)).localeCompare(tiles[i].letter)==0) {
-				count++;
+			if ((currentTile==null || ((currentTile.letter).charAt(0)).localeCompare(tiles[i].letter)==0)&&(messageOrder.charAt(count)).localeCompare(tiles[i].letter)==0) {
+				if (currentTile==null) {
+					currentTile=tiles[i];
+				}
+				else {
+					tiles[i].isPermanent=true;
+					currentTile.isPermanent=true;
+					count++;
+					currentTile=null;
+				}
 			}
 			else {
+				currentTile=null;
 				wipe(tiles);
 				
 			}
@@ -98,6 +116,8 @@ Game.drawBoard = function() {
 		msg_ctx.font="35px Arial";
 		msg_ctx.fillText(messageOrder.substring(0, count), 5, 50);
 	}
+	}
+
 	
 }
 	
