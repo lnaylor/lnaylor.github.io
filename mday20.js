@@ -116,7 +116,7 @@ Game.drawBoard = function() {
 	}
 	document.querySelector('#screen').onclick = function(event) {
 	for (var i = 0; i<tiles.length;i++) {
-		if (!tiles[i].isPermanent) {
+		if (!tiles[i].isPermanent && !tiles[i].isFaceUp) {
 		if (event.clientX > tiles[i].x && event.clientX < tiles[i].x+tiles[i].width && event.clientY > tiles[i].y && event.clientY < tiles[i].y+tiles[i].width) {
 			tiles[i].isFaceUp=true;
 			tiles[i].draw();
