@@ -1,29 +1,55 @@
-var messageOrder = "HAPPYBIRTHDAYDAVID";
+var messageOrder = "HAPPYMOTHER'SDAY";
 var count=0;
-var message="HAPPYBIRTHDAYDAVIDHAPPYBIRTHDAYDAVID";
+var saved=0;
+var message="HAPPYMOTHER'SDAY";
 var context = document.getElementById('screen').getContext('2d');
 var msg_ctx = document.getElementById('message').getContext('2d');
-var currentTile=null;
-var currentLetter="Q";
-var blocked=false;
 
 const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-const wipe = async (tiles) => {
-	blocked=true;
+const wipe = async (tiles, i) => {
   	await sleep(1000)
-
+ 	count=saved;
+	var c = (tiles[i].col)-1 ==-1 ? 3 : (tiles[i].col)-1;
+	var foundTile=false;
+	var k=0;
+	while (!foundTile) {
+		
+		if (tiles[k].row==tiles[i].row && tiles[k].col==c) {
+			if (tiles[k].isPermanent) {
+				c= c-1==-1 ? 3 : c-1;
+				k=0;
+			}
+			else {
+				var temp = tiles[i].x;
+				tiles[i].x = tiles[k].x;
+				tiles[k].x=temp;
+			
+				tiles[k].col=tiles[i].col;
+				tiles[i].col=c;
+				foundTile=true;
+			}
+			
+		}
+		else {
+			k++;
+		}
+		
+	}
 				for (var j = 0; j<tiles.length;j++) {
 					if (!tiles[j].isPermanent) {
 						tiles[j].isFaceUp=false;
-						tiles[j].draw();
+					tiles[j].draw();
 					}
+					
 				}
-				//msg_ctx.fillStyle="white";
-				//msg_ctx.fillRect(0,0,640, 80);
-	blocked=false;
+				msg_ctx.fillStyle="white";
+				msg_ctx.fillRect(0,0,640, 80);
+				msg_ctx.fillStyle="blue";
+				msg_ctx.font="35px Arial";
+				msg_ctx.fillText(messageOrder.substring(0, saved), 5, 50);
 }
 
 String.prototype.shuffle = function () {
@@ -39,13 +65,15 @@ String.prototype.shuffle = function () {
     return a.join("");
 }
 
-var Tile = function(x, y, letter) {
+var Tile = function(x, y, col, row, letter) {
 	this.x = x;
 	this.y = y;
 	this.width=50;
 	this.isFaceUp=false;
 	this.isPermanent=false;
 	this.letter=letter;
+	this.col=col;
+	this.row=row;
 };
 Tile.prototype.draw = function() {
 	if (!this.isFaceUp) {
@@ -77,9 +105,9 @@ Game.init = function() {
 
 Game.drawBoard = function() {
 	var tiles = [];
-	for (var i =0; i<6; i++) {
-		for (var j=0; j<6; j++) {
-			tiles.push(new Tile(i*55, j*55, message.charAt((i*6)+j)));
+	for (var i =0; i<4; i++) {
+		for (var j=0; j<4; j++) {
+			tiles.push(new Tile(i*55, j*55, i, j, message.charAt((i*4)+j)));
 		}
 	}
 	
@@ -87,28 +115,28 @@ Game.drawBoard = function() {
 		tiles[i].draw();
 	}
 	document.querySelector('#screen').onclick = function(event) {
-	if (!blocked) {
-			for (var i = 0; i<tiles.length;i++) {
+	for (var i = 0; i<tiles.length;i++) {
+		if (!tiles[i].isPermanent) {
 		if (event.clientX > tiles[i].x && event.clientX < tiles[i].x+tiles[i].width && event.clientY > tiles[i].y && event.clientY < tiles[i].y+tiles[i].width) {
 			tiles[i].isFaceUp=true;
 			tiles[i].draw();
-			if ((currentTile==null || ((currentTile.letter).charAt(0)).localeCompare(tiles[i].letter)==0)&&(messageOrder.charAt(count)).localeCompare(tiles[i].letter)==0) {
-				if (currentTile==null) {
-					currentTile=tiles[i];
-				}
-				else {
-					tiles[i].isPermanent=true;
-					currentTile.isPermanent=true;
-					count++;
-					currentTile=null;
+			if ((messageOrder.charAt(count)).localeCompare(tiles[i].letter)==0) {
+				count++;
+				if (count%4==0) {
+					saved=count;
+					for (var k = 0; k<tiles.length; k++) {
+						if (tiles[k].isFaceUp) {
+							tiles[k].isPermanent=true;
+						}
+					}
 				}
 			}
 			else {
-				currentTile=null;
-				wipe(tiles);
+				wipe(tiles, i);
 				
 			}
 		}
+	}
 	}
 	
 	if (count>0) {
@@ -116,8 +144,6 @@ Game.drawBoard = function() {
 		msg_ctx.font="35px Arial";
 		msg_ctx.fillText(messageOrder.substring(0, count), 5, 50);
 	}
-	}
-
 	
 }
 	
