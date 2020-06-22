@@ -1,7 +1,7 @@
-var messageOrder = "HAPPYMOTHER'SDAY";
+var messageOrder = "HAPPYFATHER'SDAY";
 var count=0;
 var saved=0;
-var message="HAPPYMOTHER'SDAY";
+var message="HAPPYFATHER'SDAY";
 var context = document.getElementById('screen').getContext('2d');
 var msg_ctx = document.getElementById('message').getContext('2d');
 
@@ -23,12 +23,51 @@ const wipe = async (tiles, i) => {
 				k=0;
 			}
 			else {
-				var temp = tiles[i].x;
+				var end1 = tiles[i].x;
+				var end2 = tiles[k].x;
+				
+				var dist = tiles[i].x-tiles[k].x;
+				if (dist<0) {
+					dist = tiles[i].x+(220-tiles[k].x);
+				}
+				
+				for (var a = 0; a<dist; a+=5) {
+					context.fillStyle="white";
+					context.fillRect(tiles[i].x, tiles[i].y, tiles[i].width, tiles[i].width);
+					tiles[i].x-=5;
+					if (tiles[i].x<0) {
+						tiles[i].x=220+tiles[i].x;
+					}
+					
+					context.fillStyle="white";
+					context.fillRect(tiles[k].x, tiles[k].y, tiles[k].width, tiles[k].width);
+		
+					tiles[k].x+=5;
+					if(tiles[k].x>220) {
+						tiles[k].x=tiles[k].x-220;
+					}
+					for (var z = 0; z<tiles.length;z++) {
+						
+							tiles[z].draw();
+					}
+					
+					await sleep(150);
+				}
+				//context.fillStyle="white";
+				//context.fillRect(tiles[i].x, tiles[i].y, tiles[i].width, tiles[i].width);
+				//context.fillStyle="white";
+				//context.fillRect(tiles[k].x, tiles[k].y, tiles[k].width, tiles[k].width);
+				
+				tiles[i].x=end2;
+				tiles[k].x=end1;
+				tiles[k].col=tiles[i].col;
+				tiles[i].col=c;
+				/*var temp = tiles[i].x;
 				tiles[i].x = tiles[k].x;
 				tiles[k].x=temp;
 			
 				tiles[k].col=tiles[i].col;
-				tiles[i].col=c;
+				tiles[i].col=c;*/
 				foundTile=true;
 			}
 			
@@ -38,11 +77,13 @@ const wipe = async (tiles, i) => {
 		}
 		
 	}
+	await sleep(150);
 				for (var j = 0; j<tiles.length;j++) {
 					if (!tiles[j].isPermanent) {
 						tiles[j].isFaceUp=false;
-					tiles[j].draw();
+					
 					}
+					tiles[j].draw();
 					
 				}
 				msg_ctx.fillStyle="white";
@@ -79,6 +120,22 @@ Tile.prototype.draw = function() {
 	if (!this.isFaceUp) {
 		context.fillStyle="blue";
 		context.fillRect(this.x, this.y, this.width, this.width);
+		
+		if (this.x+this.width>220) {
+			var left = 220-this.x;
+			var right = this.width-left;
+			
+			context.fillStyle="blue";
+			context.fillRect(0-left, this.y, this.width, this.width);
+		
+			
+			context.fillStyle="white";
+			context.fillRect(220, this.y, right, this.width);
+			
+			context.fillStyle="white";
+			context.fillRect(0-left, this.y, left, this.width);
+			
+		}
 	}
 	else {
 		context.fillStyle="white";
@@ -86,6 +143,26 @@ Tile.prototype.draw = function() {
 		context.font="35px Arial";
 		context.fillStyle="blue";
 		context.fillText(this.letter, this.x, this.y+this.width);
+		
+		if (this.x+this.width>220) {
+			var left = 220-this.x;
+			var right = this.width-left;
+			
+			context.fillStyle="white";
+			context.fillRect(0-left, this.y, this.width, this.width);
+			context.font="35px Arial";
+			context.fillStyle="blue";
+			context.fillText(this.letter, 0-left, this.y+this.width);
+		
+			
+			context.fillStyle="white";
+			context.fillRect(220, this.y, right, this.width);
+			
+			context.fillStyle="white";
+			context.fillRect(0-left, this.y, left, this.width);
+			
+		}
+		
 	}
 };
 var Game = {};
@@ -116,7 +193,7 @@ Game.drawBoard = function() {
 	}
 	document.querySelector('#screen').onclick = function(event) {
 	for (var i = 0; i<tiles.length;i++) {
-		if (!tiles[i].isPermanent && !tiles[i].isFaceUp) {
+		if (!tiles[i].isPermanent) {
 		if (event.clientX > tiles[i].x && event.clientX < tiles[i].x+tiles[i].width && event.clientY > tiles[i].y && event.clientY < tiles[i].y+tiles[i].width) {
 			tiles[i].isFaceUp=true;
 			tiles[i].draw();
