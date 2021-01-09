@@ -1,9 +1,27 @@
-var messageOrder = "HAPPYFATHER'SDAY";
+var messageOrder = "HAPPYBIRTHDAYDAD";
 var count=0;
 var saved=0;
-var message="HAPPYFATHER'SDAY";
+var message="HAPPYBIRTHDAYDAD";
 var context = document.getElementById('screen').getContext('2d');
 var msg_ctx = document.getElementById('message').getContext('2d');
+var sounds = [
+	new Audio("sounds/H.m4a"),
+	new Audio("sounds/A.m4a"),
+	new Audio("sounds/P.m4a"),
+	new Audio("sounds/P.m4a"),
+	new Audio("sounds/Y.m4a"),
+	new Audio("sounds/B.m4a"),
+	new Audio("sounds/I.m4a"),
+	new Audio("sounds/R.m4a"),
+	new Audio("sounds/T.m4a"),
+	new Audio("sounds/H.m4a"),
+	new Audio("sounds/D.m4a"),
+	new Audio("sounds/A.m4a"),
+	new Audio("sounds/Y.m4a"),
+	new Audio("sounds/D.m4a"),
+	new Audio("sounds/A.m4a"),
+	new Audio("sounds/D.m4a")
+]
 
 const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -195,9 +213,13 @@ Game.drawBoard = function() {
 	for (var i = 0; i<tiles.length;i++) {
 		if (!tiles[i].isPermanent) {
 		if (event.clientX > tiles[i].x && event.clientX < tiles[i].x+tiles[i].width && event.clientY > tiles[i].y && event.clientY < tiles[i].y+tiles[i].width) {
+			var sound = new Audio("sounds/" + tiles[i].letter + ".m4a");
+			sound.play();
 			tiles[i].isFaceUp=true;
 			tiles[i].draw();
 			if ((messageOrder.charAt(count)).localeCompare(tiles[i].letter)==0) {
+				//var sound2 = new Audio("sounds/Woohoo.m4a");
+				//sound2.play();
 				count++;
 				if (count%4==0) {
 					saved=count;
@@ -220,10 +242,20 @@ Game.drawBoard = function() {
 		msg_ctx.fillStyle="blue";
 		msg_ctx.font="35px Arial";
 		msg_ctx.fillText(messageOrder.substring(0, count), 5, 50);
+		if (count==16) {
+			playAllLetters();
+		}
 	}
 	
 }
 	
+}
+
+const playAllLetters = async() => {
+	for (var s = 0; s<sounds.length; s++) {
+		await sleep(500);
+		sounds[s].play();
+	}
 }
 
 
