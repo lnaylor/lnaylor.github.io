@@ -4,24 +4,6 @@ var saved=0;
 var message="HAPPYBIRTHDAYDAD";
 var context = document.getElementById('screen').getContext('2d');
 var msg_ctx = document.getElementById('message').getContext('2d');
-var sounds = [
-	new Audio("sounds/H.m4a"),
-	new Audio("sounds/A.m4a"),
-	new Audio("sounds/P.m4a"),
-	new Audio("sounds/P.m4a"),
-	new Audio("sounds/Y.m4a"),
-	new Audio("sounds/B.m4a"),
-	new Audio("sounds/I.m4a"),
-	new Audio("sounds/R.m4a"),
-	new Audio("sounds/T.m4a"),
-	new Audio("sounds/H.m4a"),
-	new Audio("sounds/D.m4a"),
-	new Audio("sounds/A.m4a"),
-	new Audio("sounds/Y.m4a"),
-	new Audio("sounds/D.m4a"),
-	new Audio("sounds/A.m4a"),
-	new Audio("sounds/D.m4a")
-]
 
 const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -252,6 +234,24 @@ Game.drawBoard = function() {
 }
 
 const playAllLetters = async() => {
+	var sounds = [
+	new Audio("sounds/H.m4a"),
+	new Audio("sounds/A.m4a"),
+	new Audio("sounds/P.m4a"),
+	new Audio("sounds/P.m4a"),
+	new Audio("sounds/Y.m4a"),
+	new Audio("sounds/B.m4a"),
+	new Audio("sounds/I.m4a"),
+	new Audio("sounds/R.m4a"),
+	new Audio("sounds/T.m4a"),
+	new Audio("sounds/H.m4a"),
+	new Audio("sounds/D.m4a"),
+	new Audio("sounds/A.m4a"),
+	new Audio("sounds/Y.m4a"),
+	new Audio("sounds/D.m4a"),
+	new Audio("sounds/A.m4a"),
+	new Audio("sounds/D.m4a")
+]
 	for (var s = 0; s<sounds.length; s++) {
 		await sleep(500);
 		sounds[s].play();
