@@ -1,9 +1,11 @@
-var messageOrder = "HAPPYBIRTHDAYDAD";
+var messageOrder = "HAPPYBIRTHDAYMOM";
 var count=0;
 var saved=0;
-var message="HAPPYBIRTHDAYDAD";
+var message="HAPPYBIRTHDAYMOM";
 var context = document.getElementById('screen').getContext('2d');
 var msg_ctx = document.getElementById('message').getContext('2d');
+
+var locked = false;
 
 const sleep = (milliseconds) => {
   return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -91,6 +93,7 @@ const wipe = async (tiles, i) => {
 				msg_ctx.fillStyle="blue";
 				msg_ctx.font="35px Arial";
 				msg_ctx.fillText(messageOrder.substring(0, saved), 5, 50);
+				locked=false;
 }
 
 String.prototype.shuffle = function () {
@@ -162,7 +165,6 @@ Tile.prototype.draw = function() {
 			context.fillRect(0-left, this.y, left, this.width);
 			
 		}
-		
 	}
 };
 var Game = {};
@@ -193,15 +195,15 @@ Game.drawBoard = function() {
 	}
 	document.querySelector('#screen').onclick = function(event) {
 	for (var i = 0; i<tiles.length;i++) {
-		if (!tiles[i].isPermanent) {
+		if (!locked && !tiles[i].isPermanent) {
 		if (event.clientX > tiles[i].x && event.clientX < tiles[i].x+tiles[i].width && event.clientY > tiles[i].y && event.clientY < tiles[i].y+tiles[i].width) {
-			var sound = new Audio("sounds/" + tiles[i].letter + ".m4a");
-			sound.play();
+			locked = true;
+			
 			tiles[i].isFaceUp=true;
 			tiles[i].draw();
 			if ((messageOrder.charAt(count)).localeCompare(tiles[i].letter)==0) {
-				//var sound2 = new Audio("sounds/Woohoo.m4a");
-				//sound2.play();
+				var sound2 = new Audio("sounds/Woohoo.m4a");
+				sound2.play();
 				count++;
 				if (count%4==0) {
 					saved=count;
@@ -211,10 +213,12 @@ Game.drawBoard = function() {
 						}
 					}
 				}
+				locked=false;
 			}
 			else {
+				var sound = new Audio("sounds/" + tiles[i].letter + ".m4a");
+				sound.play();
 				wipe(tiles, i);
-				
 			}
 		}
 	}
@@ -248,9 +252,9 @@ const playAllLetters = async() => {
 	new Audio("sounds/D.m4a"),
 	new Audio("sounds/A.m4a"),
 	new Audio("sounds/Y.m4a"),
-	new Audio("sounds/D.m4a"),
-	new Audio("sounds/A.m4a"),
-	new Audio("sounds/D.m4a")
+	new Audio("sounds/M.m4a"),
+	new Audio("sounds/O.m4a"),
+	new Audio("sounds/M.m4a")
 ]
 	for (var s = 0; s<sounds.length; s++) {
 		await sleep(500);
